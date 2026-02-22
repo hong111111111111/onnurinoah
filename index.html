@@ -1,400 +1,168 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>사당홀리스타 플로잉</title>
-  <style>
-    :root{
-      --bg:#f2f4f7;
-      --card:#fff;
-      --text:#111;
-      --sub:#666;
-      --muted:#999;
-      --line:#eee;
-      --kakao:#FEE500;
-      --kakaoText:#3c1e1e;
-      --dark:#333;
-      --mint:#008485;
-      --shadow: 0 10px 30px rgba(0,0,0,0.05);
-      --r24:24px;
-      --r16:16px;
-      --r15:15px;
-    }
-    *{box-sizing:border-box}
-    body{
-      font-family:-apple-system,system-ui,sans-serif;
-      background-color:var(--bg);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      margin:0;
-      padding:18px;
-      color:var(--text);
-    }
-    .wrap{width:100%; max-width:380px;}
-    .kakao-banner{
-      display:none;
-      position:fixed;
-      top:0; left:0; right:0;
-      z-index:9999;
-      padding:12px 14px;
-      background:#111;
-      color:#fff;
-      font-size:14px;
-      line-height:1.35;
-    }
-    .kakao-banner b{color:var(--kakao)}
-    .kakao-banner .row{
-      margin-top:8px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .kakao-banner .chip{
-      border:1px solid rgba(255,255,255,0.18);
-      color:#fff;
-      background:rgba(255,255,255,0.06);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .card{
-      background:var(--card);
-      width:100%;
-      border-radius:var(--r24);
-      padding:26px;
-      box-shadow:var(--shadow);
-      text-align:center;
-    }
-    .title{
-      font-size:1.3rem;
-      font-weight:800;
-      margin-bottom:6px;
-    }
-    .subtitle{
-      font-size:0.92rem;
-      color:var(--sub);
-      margin-bottom:22px;
-    }
-
-    .account-info{
-      background:#f8f9fa;
-      border-radius:var(--r16);
-      padding:18px;
-      margin-bottom:18px;
-      border:1px solid var(--line);
-    }
-    .bank{
-      color:var(--mint);
-      font-weight:800;
-      font-size:0.9rem;
-      margin-bottom:6px;
-    }
-    .num{
-      font-size:1.2rem;
-      font-weight:800;
-      color:#222;
-      display:block;
-      margin-bottom:6px;
-      letter-spacing:0.2px;
-    }
-    .holder{ font-size:0.95rem; color:#444; }
-
-    .btn{
-      width:100%;
-      padding:16px;
-      border:none;
-      border-radius:var(--r15);
-      font-size:1rem;
-      font-weight:800;
-      cursor:pointer;
-      margin-bottom:10px;
-      transition:0.15s;
-      display:block;
-      text-decoration:none;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn:active{ transform:scale(0.985); opacity:0.92; }
-
-    .btn-copy{ background:var(--dark); color:#fff; }
-    .btn-kakao{ background:var(--kakao); color:var(--kakaoText); }
-
-    .notice{
-      font-size:0.78rem;
-      color:var(--muted);
-      margin-top:14px;
-      line-height:1.45;
-    }
-
-    /* 토스트 */
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:22px;
-      transform:translateX(-50%);
-      background:rgba(17,17,17,0.92);
-      color:#fff;
-      padding:12px 14px;
-      border-radius:999px;
-      font-size:13px;
-      z-index:9999;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.2s, transform 0.2s;
-      max-width:min(560px, 92vw);
-      text-align:center;
-      line-height:1.25;
-    }
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(-2px);
-    }
-
-    /* 실패/대안 패널 */
-    .fallback{
-      display:none;
-      margin-top:12px;
-      padding:14px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:#fafbfc;
-      text-align:left;
-    }
-    .fallback .h{
-      font-weight:900;
-      font-size:0.95rem;
-      margin-bottom:8px;
-      color:#222;
-    }
-    .fallback .p{
-      font-size:0.85rem;
-      color:#555;
-      line-height:1.4;
-      margin-bottom:10px;
-    }
-    .fallback .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:8px;
-    }
-    .btn-mini{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-weight:800;
-      cursor:pointer;
-      text-align:center;
-      font-size:0.92rem;
-    }
-    .btn-mini:active{transform:scale(0.99); opacity:0.94;}
-    .muted{font-size:0.78rem; color:#777; margin-top:8px; line-height:1.45;}
-  </style>
-</head>
-
-<body>
-  <!-- 카카오톡 인앱브라우저 안내 배너 -->
-  <div class="kakao-banner" id="kakaoBanner" role="region" aria-label="카카오톡 안내">
-    카카오톡 안에서 열면 송금앱 연결이 안 될 수 있어요.<br />
-    <b>우측 상단 ‘…’ → ‘다른 브라우저에서 열기(사파리/크롬)’</b>로 열어주세요.
-    <div class="row">
-      <span class="chip" id="copyChip">계좌 복사</span>
-      <span class="chip" id="closeBanner">닫기</span>
-    </div>
-  </div>
-
-  <div class="wrap">
-    <div class="card">
-      <div class="title">사당홀리스타 플로잉</div>
-      <div class="subtitle">하나님 나라를 위한 흘려보냄</div>
-
-      <div class="account-info">
-        <div class="bank" id="bankName">하나은행</div>
-        <div class="num" id="accNum">228-910022-13204</div>
-        <div class="holder">온누리교회(사당홀리스타)</div>
-      </div>
-
-      <button class="btn btn-copy" id="btnCopy">계좌번호 복사하기</button>
-      <button class="btn btn-kakao" id="btnKakao">카카오페이 송금</button>
-
-      <!-- 딥링크 실패 시 대체 안내 -->
-      <div class="fallback" id="fallbackBox" aria-live="polite">
-        <div class="h">카카오페이가 바로 안 열리나요?</div>
-        <div class="p">
-          이미 계좌번호는 복사했어요.<br />
-          아래 방법 중 하나를 선택해 붙여넣기 해주세요.
-        </div>
-        <div class="grid">
-          <button class="btn-mini" id="btnOpenKakaoTalk">카카오톡 열기</button>
-          <button class="btn-mini" id="btnCopyAgain">계좌 다시 복사</button>
-        </div>
-        <div class="muted">
-          팁) 카카오톡에서 <b>더보기(…)</b> → <b>Pay/송금</b> 메뉴에서<br />
-          붙여넣기 하면 가장 확실해요.
-        </div>
-      </div>
-
-      <div class="notice">
-        * 버튼 클릭 시 계좌번호가 <b>자동 복사</b>됩니다.<br />
-        * 앱이 열리지 않으면 카카오페이/카카오톡 송금 메뉴에서 <b>붙여넣기</b> 해주세요.
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" aria-live="polite"></div>
-
-  <script>
-    // =========================
-    // 설정값
-    // =========================
-    const BANK_KO = "하나은행";
-    const ACCOUNT_DISPLAY = "228-910022-13204";
-    const ACCOUNT_RAW = "22891002213204";
-    const ACCOUNT_FULL = `${BANK_KO} ${ACCOUNT_DISPLAY}`;
-    const BANK_CODE = "081"; // 하나은행(예시) - 카카오 내부 파라미터는 환경에 따라 무시/변경될 수 있음
-
-    // =========================
-    // 유틸: 토스트
-    // =========================
-    const toastEl = document.getElementById("toast");
-    let toastTimer = null;
-
-    function toast(msg, ms = 1600) {
-      clearTimeout(toastTimer);
-      toastEl.textContent = msg;
-      toastEl.classList.add("show");
-      toastTimer = setTimeout(() => toastEl.classList.remove("show"), ms);
-    }
-
-    // =========================
-    // 유틸: 클립보드 (우선 Clipboard API, 실패 시 fallback)
-    // =========================
-    async function copySmart(text) {
-      // Clipboard API (https + 사용자 제스처 필요)
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          return true;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>사당홀리스타 플로잉</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --primary: #008485; /* 하나은행 메인 컬러 */
+            --text: #1a1a1b;
+            --sub-text: #666;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-      } catch (e) {}
 
-      // fallback
-      try {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        ta.style.left = "-9999px";
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        const ok = document.execCommand("copy");
-        document.body.removeChild(ta);
-        return ok;
-      } catch (e) {
-        return false;
-      }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .card {
+            background: var(--card);
+            width: 90%;
+            max-width: 360px;
+            border-radius: 24px;
+            padding: 35px 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--sub-text);
+            margin-bottom: 30px;
+        }
+
+        .account-box {
+            background: #f8f9fa;
+            border: 1px solid #edf0f2;
+            border-radius: 16px;
+            padding: 25px 15px;
+            margin-bottom: 30px;
+        }
+
+        .bank-name {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .account-num {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #222;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .account-holder {
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .btn-copy {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 16px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 132, 133, 0.2);
+        }
+
+        .btn-copy:active {
+            transform: scale(0.97);
+            box-shadow: none;
+        }
+
+        /* 토스트 메시지 */
+        .toast {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(33, 33, 33, 0.9);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="title">사당홀리스타 플로잉 계좌</div>
+    <div class="subtitle">마음을 담아 흘려보내 주셔서 감사합니다.</div>
+
+    <div class="account-box">
+        <span class="bank-name">하나은행</span>
+        <span class="account-num" id="accNum">228-910022-13204</span>
+        <div class="account-holder">온누리교회(사당홀리스타)</div>
+    </div>
+
+    <button class="btn-copy" onclick="copyAccount()">계좌번호 복사하기</button>
+</div>
+
+<div id="toast" class="toast">계좌번호가 복사되었습니다!</div>
+
+<script>
+    function copyAccount() {
+        const accountNumber = "228-910022-13204";
+        
+        // 구형 폰에서도 작동하는 복사 방식
+        const textArea = document.createElement("textarea");
+        textArea.value = accountNumber;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            showToast();
+        } catch (err) {
+            alert("복사에 실패했습니다. 번호를 길게 눌러 직접 복사해 주세요.");
+        }
+        
+        document.body.removeChild(textArea);
     }
 
-    // =========================
-    // 카카오 인앱 감지 + 배너
-    // =========================
-    function isKakaoInApp() {
-      return /KAKAOTALK/i.test(navigator.userAgent);
+    function showToast() {
+        const toast = document.getElementById("toast");
+        toast.classList.add("show");
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2000);
     }
+</script>
 
-    const kakaoBanner = document.getElementById("kakaoBanner");
-    const copyChip = document.getElementById("copyChip");
-    const closeBanner = document.getElementById("closeBanner");
-
-    window.addEventListener("load", () => {
-      // UI 텍스트 세팅 (혹시 값 바꾸면 자동 반영되게)
-      document.getElementById("bankName").textContent = BANK_KO;
-      document.getElementById("accNum").textContent = ACCOUNT_DISPLAY;
-
-      if (isKakaoInApp()) {
-        kakaoBanner.style.display = "block";
-        document.body.style.paddingTop = "72px";
-      }
-    });
-
-    closeBanner.addEventListener("click", () => {
-      kakaoBanner.style.display = "none";
-      document.body.style.paddingTop = "0px";
-    });
-
-    copyChip.addEventListener("click", async () => {
-      const ok = await copySmart(ACCOUNT_FULL);
-      toast(ok ? "계좌번호가 복사되었습니다!" : "복사에 실패했어요. 길게 눌러 복사해 주세요.");
-    });
-
-    // =========================
-    // 딥링크 실행 헬퍼
-    // - 성공 여부를 JS로 확정할 수 없어서 "실패 대비 UX"가 핵심
-    // =========================
-    const fallbackBox = document.getElementById("fallbackBox");
-
-    function showFallbackSoon(delayMs = 1400) {
-      setTimeout(() => {
-        // 사용자가 이미 외부로 이동했다면 보이지 않을 수 있음
-        fallbackBox.style.display = "block";
-      }, delayMs);
-    }
-
-    function tryOpenUrl(url) {
-      // 일부 브라우저는 location.href가 더 잘 먹고,
-      // 일부는 window.open이 더 나을 때가 있어 둘 다 시도.
-      try { location.href = url; } catch (e) {}
-      try { window.open(url, "_self"); } catch (e) {}
-    }
-
-    // =========================
-    // 버튼 핸들러
-    // =========================
-    document.getElementById("btnCopy").addEventListener("click", async () => {
-      const ok = await copySmart(ACCOUNT_FULL);
-      toast(ok ? "계좌번호가 복사되었습니다!" : "복사에 실패했어요. 길게 눌러 복사해 주세요.");
-    });
-
-    document.getElementById("btnKakao").addEventListener("click", async () => {
-      fallbackBox.style.display = "none";
-
-      // 1) 먼저 계좌(숫자만) 복사 — 송금 앱이 안 열려도 붙여넣기 가능하게
-      const ok = await copySmart(ACCOUNT_RAW);
-      toast(ok ? "계좌번호를 복사했어요. 카카오페이를 여는 중…" : "복사에 실패했어요. 카카오페이에서 직접 입력해 주세요.");
-
-      // 2) 카카오페이 딥링크 시도
-      // ⚠️ 주의: 아래 URL은 환경/정책에 따라 동작하지 않을 수 있음(카카오 인앱/iOS에서 특히).
-      // 그래도 "시도 + 실패 대비 UX"로 전환율을 올리는 전략.
-      const kakaoUrl = `kakaotalk://kakaopay/money/to/qr?bank_code=${encodeURIComponent(BANK_CODE)}&account_number=${encodeURIComponent(ACCOUNT_RAW)}`;
-
-      tryOpenUrl(kakaoUrl);
-
-      // 3) 안 열릴 때를 위한 대체 패널 표시
-      showFallbackSoon(1500);
-    });
-
-    // =========================
-    // 대체 패널 버튼
-    // =========================
-    document.getElementById("btnOpenKakaoTalk").addEventListener("click", () => {
-      // 카카오톡만이라도 열어주면 사용자가 Pay/송금 메뉴로 이동 가능
-      tryOpenUrl("kakaotalk://launch");
-      toast("카카오톡을 여는 중…");
-    });
-
-    document.getElementById("btnCopyAgain").addEventListener("click", async () => {
-      const ok = await copySmart(ACCOUNT_FULL);
-      toast(ok ? "계좌번호를 다시 복사했어요!" : "복사에 실패했어요. 길게 눌러 복사해 주세요.");
-    });
-  </script>
 </body>
 </html>
