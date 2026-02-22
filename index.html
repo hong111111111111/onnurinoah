@@ -2,68 +2,96 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>사당홀리스타 플로잉 계좌</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>사당홀리스타 플로잉</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #f4f7fb; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
-        h2 { color: #333; margin-bottom: 0.5rem; font-size: 1.25rem; }
-        .account-box { background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border: 1px dashed #ced4da; }
-        .bank-name { font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; }
-        .account-number { font-size: 1.3rem; font-weight: bold; color: #222; word-break: break-all; }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-copy { background-color: #008485; color: white; } /* 하나은행 컬러 느낌 */
+        /* 디자인: 깔끔한 모바일 카드 스타일 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .container { background: white; width: 100%; max-width: 380px; border-radius: 24px; padding: 30px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); text-align: center; }
+        h1 { font-size: 1.4rem; color: #1a1a1b; margin-bottom: 8px; letter-spacing: -0.5px; }
+        p.subtitle { color: #666; font-size: 0.95rem; margin-bottom: 25px; }
+        
+        .account-card { background: #f8f9fa; border: 1px solid #eee; border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
+        .bank-tag { display: inline-block; background: #008485; color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; margin-bottom: 10px; }
+        .account-number { font-size: 1.35rem; font-weight: 700; color: #222; margin-bottom: 5px; display: block; }
+        .account-name { font-size: 1rem; color: #444; }
+
+        .btn-list { display: flex; flex-direction: column; gap: 12px; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        
+        .btn-copy { background-color: #333; color: white; }
         .btn-kakao { background-color: #FEE500; color: #3c1e1e; }
         .btn-toss { background-color: #3182f6; color: white; }
-        button:active { opacity: 0.8; transform: scale(0.98); }
+        
+        .btn:active { transform: scale(0.97); opacity: 0.9; }
+        .footer-text { margin-top: 20px; font-size: 0.8rem; color: #999; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>사당홀리스타 플로잉 계좌</h2>
-    
-    <div class="account-box" id="accountContainer">
-        <div class="bank-name">하나은행 (온누리교회 사당홀리스타)</div>
-        <div class="account-number" id="accountNum">228-910022-13204</div>
+<div class="container">
+    <h1>사당홀리스타 플로잉 계좌</h1>
+    <p class="subtitle">마음을 담아 흘려보내 주셔서 감사합니다.</p>
+
+    <div class="account-card" id="copyArea">
+        <span class="bank-tag">하나은행</span>
+        <span class="account-number">228-910022-13204</span>
+        <span class="account-name">온누리교회(사당홀리스타)</span>
     </div>
 
-    <div class="btn-group">
-        <button class="btn-copy" onclick="copyAccount()">계좌번호 복사하기</button>
-        <button class="btn-kakao" onclick="goKakao()">카카오페이로 송금</button>
-        <button class="btn-toss" onclick="goToss()">토스(Toss)로 송금</button>
+    <div class="btn-list">
+        <button class="btn btn-copy" onclick="copyOnly()">계좌번호 복사하기</button>
+        
+        <button class="btn btn-kakao" onclick="payKakao()">카카오페이 송금</button>
+        
+        <button class="btn btn-toss" onclick="payToss()">토스(Toss) 송금</button>
     </div>
+
+    <p class="footer-text">버튼 클릭 시 앱으로 연결되며 계좌가 복사됩니다.</p>
 </div>
 
 <script>
-    const accountNumber = "22891002213204"; // 하이픈 제외 숫자만
+    const fullAccount = "228-910022-13204";
+    const rawAccount = "22891002213204";
 
-    // 계좌 복사 함수
-    function copyAccount() {
-        const textToCopy = "하나은행 228-910022-13204";
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert("계좌번호가 복사되었습니다.");
-        });
+    // 공통 복사 함수
+    function copyToClipboard(text) {
+        const t = document.createElement("textarea");
+        document.body.appendChild(t);
+        t.value = text;
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
     }
 
-    // 카카오페이 연결 (모바일 전용)
-    function goKakao() {
-        // 카카오페이 송금 스킴 (하나은행 코드: 081)
-        const kakaoUrl = `kakaotalk://kakaopay/money/to/qr?bank_code=081&account_number=${accountNumber}`;
-        window.location.href = kakaoUrl;
+    // 복사만 실행
+    function copyOnly() {
+        copyToClipboard(fullAccount);
+        alert("계좌번호가 복사되었습니다. 원하시는 은행 앱에 붙여넣으세요!");
+    }
+
+    // 카카오페이 실행
+    function payKakao() {
+        copyToClipboard(fullAccount); // 실행과 동시에 복사 (안전장치)
+        // 하나은행 코드: 081
+        const url = `kakaotalk://kakaopay/money/to/qr?bank_code=081&account_number=${rawAccount}`;
+        window.location.href = url;
         
+        // 앱 미설치나 반응 없을 시 안내
         setTimeout(() => {
-            if (confirm("카카오톡이 열리지 않나요? 복사 기능을 이용해 주세요.")) {
-                copyAccount();
-            }
-        }, 1500);
+            alert("카카오톡으로 연결되었습니다.\n계좌번호가 복사되었으니 '붙여넣기' 하세요.");
+        }, 1000);
     }
 
-    // 토스 연결 (모바일 전용)
-    function goToss() {
-        const tossUrl = `supertoss://send?bank=하나&accountNo=${accountNumber}`;
-        window.location.href = tossUrl;
+    // 토스 실행
+    function payToss() {
+        copyToClipboard(fullAccount); // 실행과 동시에 복사
+        const url = `supertoss://send?bank=하나&accountNo=${rawAccount}`;
+        window.location.href = url;
+
+        setTimeout(() => {
+            alert("토스로 연결되었습니다.\n계좌번호가 복사되었으니 '붙여넣기' 하세요.");
+        }, 1000);
     }
 </script>
 
