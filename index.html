@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사당홀리스타 플로잉 계좌</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #f4f7fb; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        h2 { color: #333; margin-bottom: 0.5rem; font-size: 1.25rem; }
+        .account-box { background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border: 1px dashed #ced4da; }
+        .bank-name { font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; }
+        .account-number { font-size: 1.3rem; font-weight: bold; color: #222; word-break: break-all; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-copy { background-color: #008485; color: white; } /* 하나은행 컬러 느낌 */
+        .btn-kakao { background-color: #FEE500; color: #3c1e1e; }
+        .btn-toss { background-color: #3182f6; color: white; }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>사당홀리스타 플로잉 계좌</h2>
+    
+    <div class="account-box" id="accountContainer">
+        <div class="bank-name">하나은행 (온누리교회 사당홀리스타)</div>
+        <div class="account-number" id="accountNum">228-910022-13204</div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-copy" onclick="copyAccount()">계좌번호 복사하기</button>
+        <button class="btn-kakao" onclick="goKakao()">카카오페이로 송금</button>
+        <button class="btn-toss" onclick="goToss()">토스(Toss)로 송금</button>
+    </div>
+</div>
+
+<script>
+    const accountNumber = "22891002213204"; // 하이픈 제외 숫자만
+
+    // 계좌 복사 함수
+    function copyAccount() {
+        const textToCopy = "하나은행 228-910022-13204";
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("계좌번호가 복사되었습니다.");
+        });
+    }
+
+    // 카카오페이 연결 (모바일 전용)
+    function goKakao() {
+        // 카카오페이 송금 스킴 (하나은행 코드: 081)
+        const kakaoUrl = `kakaotalk://kakaopay/money/to/qr?bank_code=081&account_number=${accountNumber}`;
+        window.location.href = kakaoUrl;
+        
+        setTimeout(() => {
+            if (confirm("카카오톡이 열리지 않나요? 복사 기능을 이용해 주세요.")) {
+                copyAccount();
+            }
+        }, 1500);
+    }
+
+    // 토스 연결 (모바일 전용)
+    function goToss() {
+        const tossUrl = `supertoss://send?bank=하나&accountNo=${accountNumber}`;
+        window.location.href = tossUrl;
+    }
+</script>
+
+</body>
+</html>
